@@ -34,7 +34,7 @@ export type S3Config = {
   baseUrl?: string;
   transformFilename?: (str: string) => string;
   getFilename?: (args: GetFileNameFunc) => string;
-  getUrl?: (config: S3Config, fileData: S3DataType) => string;
+  getUrl?: (config: S3Config, fileData: S3DataType) => Promise<string>;
   uploadParams?: (args: S3DataType) => Partial<AWS.S3.Types.PutObjectRequest>;
   s3Options: AWS.S3.ClientConfiguration;
 };
