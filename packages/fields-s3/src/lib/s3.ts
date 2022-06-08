@@ -1,14 +1,14 @@
+import { ImageMetadata } from '@keystone-6/core/types';
+import slugify from '@sindresorhus/slugify';
+import AWS from 'aws-sdk';
+import cuid from 'cuid';
+import filenamify from 'filenamify';
 import { ReadStream } from 'fs';
 import { FileUpload } from 'graphql-upload';
-import AWS from 'aws-sdk';
-import urlJoin from 'url-join';
-import cuid from 'cuid';
-import slugify from '@sindresorhus/slugify';
-import filenamify from 'filenamify';
-import { ImageMetadata } from '@keystone-6/core/types';
-import fromBuffer from 'image-type';
 import imageSize from 'image-size';
-import { AssetType, S3DataType, S3Config, FileData, ImageData } from './types';
+import fromBuffer from 'image-type';
+import urlJoin from 'url-join';
+import { AssetType, FileData, ImageData, S3Config, S3DataType } from './types';
 import { parseFileRef, parseImageRef } from './utils';
 
 const defaultTransformer = (str: string) => slugify(str);
@@ -44,7 +44,7 @@ const defaultGetUrl = ({ bucket, folder }: S3Config, fileData: S3DataType) => {
   return urlJoin(`https://${bucket}.s3.amazonaws.com`, folder || '', filename);
 };
 
-export function getUrl(config: S3Config, fileData: S3DataType) {
+export async function getUrl(config: S3Config, fileData: S3DataType) {
   if (config.baseUrl) {
     return urlJoin(config.baseUrl, getFilename(fileData));
   }

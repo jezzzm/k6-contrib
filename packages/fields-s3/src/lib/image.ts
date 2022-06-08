@@ -1,16 +1,15 @@
-import path from 'path';
-import { Path } from 'graphql/jsutils/Path';
-
+import { graphql } from '@keystone-6/core';
 import {
-  BaseGeneratedListTypes,
+  BaseListTypeInfo,
   fieldType,
   FieldTypeFunc,
   KeystoneContext,
 } from '@keystone-6/core/types';
-import { graphql } from '@keystone-6/core';
-import { getImageRef, SUPPORTED_IMAGE_EXTENSIONS, isValidImageExtension } from './utils';
-import { ImageData, S3FieldConfig, S3FieldInputType, S3Config, S3DataType } from './types';
+import { Path } from 'graphql/jsutils/Path';
+import path from 'path';
 import { getDataFromRef, getDataFromStream, getUrl } from './s3';
+import { ImageData, S3Config, S3DataType, S3FieldConfig, S3FieldInputType } from './types';
+import { getImageRef, isValidImageExtension, SUPPORTED_IMAGE_EXTENSIONS } from './utils';
 
 const views = path.join(path.dirname(__dirname), 'views/image');
 
@@ -62,7 +61,7 @@ const imageOutputFields = graphql.fields<Omit<ImageData, 'type'>>()({
   }),
   url: graphql.field({
     type: graphql.nonNull(graphql.String),
-    resolve(data, args, context, info) {
+    async resolve(data, args, context, info) {
       const { key, typename } = info.path.prev as Path;
       const config = _fieldConfigs[`${typename}-${key}`];
       return getUrl(config, { type: 'image', ...data } as S3DataType);
@@ -83,10 +82,10 @@ const S3ImageFieldOutputType = graphql.object<Omit<ImageData, 'type'>>()({
 });
 
 export const s3Image =
-  <TGeneratedListTypes extends BaseGeneratedListTypes>({
+  <TGeneratedListTypes extends BaseListTypeInfo>({
     s3Config,
     ...config
-  }: S3FieldConfig<TGeneratedListTypes>): FieldTypeFunc =>
+  }: S3FieldConfig<TGeneratedListTypes>): FieldTypeFunc<TGeneratedListTypes> =>
   meta => {
     if ((config as any).isUnique) {
       throw Error('isUnique is not a supported option for field type image');
